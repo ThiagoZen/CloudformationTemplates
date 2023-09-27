@@ -1,0 +1,66 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters" : {
+        "VPCID" : {
+          "Type" : "String",
+          "Default" : "vpc-00a45ff570ec7bd84",
+          "Description" : "Digite o ID da VPC."
+        },
+        "SUBNETID" :{
+            "Type" : "String",
+            "Default" : "subnet-051d7ecec3a5fba18",
+            "Description" : "Digite o ID da Subnet."
+        }
+    },
+    "Resources": {
+        "EC2sg": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupName": "EC2sg",
+                "VpcId": { "Ref" : "VPCID" },
+                "GroupDescription": "SSH Desbloqueado",
+                "SecurityGroupIngress":
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "IpProtocol": "tcp",
+                        "FromPort": 22,
+                        "ToPort": 22
+                    }
+            }
+        },
+        "EFSsg": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupName": "EFSsg",
+                "VpcId": { "Ref" : "VPCID" },
+                "GroupDescription": "NFS Desbloqueado",
+                "SecurityGroupIngress": {
+                    "SourceSecurityGroupId": {
+                        "Ref": "EC2sg"
+                    },
+                    "IpProtocol": "tcp",
+                    "FromPort": 2049,
+                    "ToPort": 2049
+                }
+            }
+        },
+        "EFSFILESYSTEM": {
+            "Type": "AWS::EFS::FileSystem",
+            "Properties": {}
+        },
+        "EFSMOUNT": {
+            "Type": "AWS::EFS::MountTarget",
+            "Properties": {
+                "FileSystemId": {
+                    "Ref": "EFSFILESYSTEM"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "EFSsg"
+                    }
+                ],
+                "SubnetId": {"Ref": "SUBNETID" }
+            }
+        }
+    }
+}

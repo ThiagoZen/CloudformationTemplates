@@ -1,0 +1,84 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters" : {
+        "VPCID" : {
+          "Type" : "String",
+          "Default" : "vpc-00a45ff570ec7bd84",
+          "Description" : "Digite o ID da VPC."
+        },
+        "SUBNETID" :{
+            "Type" : "String",
+            "Default" : "subnet-051d7ecec3a5fba18",
+            "Description" : "Digite o ID da Subnet."
+        },
+        "REGIONINFRA" :{
+            "Type" : "String",
+            "Default" : "us-east-2",
+            "Description" : "Digite a região de sua escolha."
+        },
+        "SSHKEYNAME" : {
+            "Type" : "String",
+            "Default" : "MYKEY",
+            "Description" : "Digite o nome da sua Chave de segurança SSH."
+        },
+        "GroupId" : {
+            "Type" : "String",
+            "Description" : "Digite o ID do Grupo de segurança"
+        },
+        "EFSFILESYSTEM" : {
+            "Type" : "String",
+            "Description" : "Digite o ID do EFS"
+        }        
+        
+    },
+    "Resources": {
+        "EC2TESTE": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-024e6efaf93d85776",
+                "SubnetId": {"Ref" : "SUBNETID"},
+                "KeyName": {"Ref" : "SSHKEYNAME"},
+                "InstanceType": "t2.micro",
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "GroupId"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -xe\n",
+                                "apt-get update\n",
+                                "apt-get -y install git binutils\n",
+                                "mkdir /efs-utils\n",
+                                "mkdir /efs\n",
+                                "git clone https://github.com/aws/efs-utils /efs-utils\n",
+                                "cd /efs-utils\n",
+                                "./build-deb.sh\n",
+                                "apt-get -y install ./build/amazon-efs-utils*deb\n",
+                                {
+                                    "Fn::Sub": [
+                                        "echo '${EFSID}.efs.${REGION}.amazonaws.com:/ /efs efs defaults,_netdev 0 0' >> /etc/fstab \n",
+                                        {
+                                            "EFSID":
+                                            {
+                                                "Ref":"EFSFILESYSTEM"
+                                            },
+                                            "REGION" : {
+                                                "Ref":"REGIONINFRA"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "reboot\n"
+                                                            
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
