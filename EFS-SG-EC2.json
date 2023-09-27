@@ -15,12 +15,12 @@
         "SSHKEYNAME" : {
             "Type" : "String",
             "Default" : "MYKEY",
-            "Description" : "Digite o nome da sua Chave de segurança SSH."
+            "Description" : "Digite o nome da sua Chave de seguranca SSH."
         },
         "REGIONINFRA" :{
             "Type" : "String",
             "Default" : "us-east-2",
-            "Description" : "Digite a região de sua escolha."
+            "Description" : "Digite a regiao de sua escolha."
         }
     },
 
