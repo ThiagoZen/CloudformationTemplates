@@ -3,5 +3,5 @@
 
 **EFS-SG** - Cria os 2 Grupos de segurança, um que libera a porta para o SSH e outro que libera a porta para o NFS, e 1 Sistema de arquivos EFS
 
-**EC2_MountEFS** - Cria 1 máquinas virtuais ec2 que monta automaticamente sistema de arquivos EFS
+**EC2_MountEFS** - Cria 1 máquina virtual ec2 que monta automaticamente sistema de arquivos EFS
 
